@@ -6,18 +6,19 @@ using UnityEngine.SceneManagement;
 
 public class LoadGame : MonoBehaviour
 {  
+    
     public void LoadNextScene() 
     {
-        // Build settings den aktif sahneden bir sonraki sahneyi yükle.
+        // BUILD SETTINGSDEKI AKTIF SAHNEDEN BIR SONRAKI SAHNEYE GEC
 
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 1); 
     }
     public void ExitGame()
     {
-        // Oyundan çýk ve editördeki oyunu durdur.
+        // OYUNDAN CIK VE EDITORDEKI OYUNU DURDUR
 
          Application.Quit();
-         EditorApplication.isPlaying = false;
+         //EditorApplication.isPlaying = false;
         
     }
 }

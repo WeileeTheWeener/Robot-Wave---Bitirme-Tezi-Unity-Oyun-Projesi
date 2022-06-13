@@ -27,15 +27,17 @@ public class EnemyChaseState : State
     public bool timerIsRunning;
     public bool isGoingBack;
     public float forwardDist;
+
     public override State RunCurrentState()
     {
-
+        //EGER OYUNCUYU GORUYORSA SALDIRI DURUMUNA GEC
         if (canSeePlayer)
         {
             Debug.Log("return to attackstate");
             return attackState;
            
         }
+        //EGER BOSA DONME FONKSIYONU TRUE ISE BOS DURUMUNA GEC
         if(ReturnToIdle())
         {
             Debug.Log("return to idle state");
@@ -44,15 +46,11 @@ public class EnemyChaseState : State
         }
         else
         {
-            //Debug.Log("return this");
+     
             return this;
         }
 
-
-
     }
-
-    // Start is called before the first frame update
     void Start()
     {
         player = GameObject.FindWithTag("Player");
@@ -67,11 +65,9 @@ public class EnemyChaseState : State
         searchTimeRemaining = searchTime;
         isGoingBack = false;
     }
-
-
-    // Update is called once per frame
     public override void _Update()
     {
+    //EGER BOS DURUMUNA GERI DONMUYOR ISE
     if(!isGoingBack)
         {
             gameObject.transform.root.GetComponent<FieldOfView>().radius = radius;
@@ -81,33 +77,31 @@ public class EnemyChaseState : State
             {
                 distanceBetweenTwoObjects = Vector3.Distance(player.transform.position, gameObject.transform.position);
             }
-
             canSeePlayer = gameObject.transform.root.GetComponent<FieldOfView>().canSeePlayer;
 
-
-            //StartTimer();
-
-
+            //OYUNCUYU ARAMA ZAMANININI AZALT DURDUGU NOKTADA BELIRLI BIR SURE BEKLE VE ARAMAYA DEVAM ET
             if (searchTimeRemaining > 0)
             {
                 searchTimeRemaining -= Time.deltaTime;
-            }
+
+                if (Time.time >= nextTimeToMove)
+                {
+                    nextTimeToMove = Time.time + idleTime;
+                    Move(GetNextPoint());
+                }
+            }//ZAMAN DOLMUS ISE BASLANGIC POZISYONUNA DON
             else
             {
                 Debug.Log("Time has run out!");
                 isGoingBack = true;
-                
-
-
+                Move(startLoc);
             }
 
-
-            if (searchTimeRemaining > 0)
+           /* if (searchTimeRemaining > 0)
             {
                 if (Time.time >= nextTimeToMove)
                 {
-                    nextTimeToMove = Time.time + idleTime;
-                    //Move(player.transform.position);
+                    nextTimeToMove = Time.time + idleTime;          
                     Move(GetNextPoint());
                 }
 
@@ -116,24 +110,15 @@ public class EnemyChaseState : State
             {
                 Move(startLoc);
 
-            }
-            /*if(!timerIsRunning && Vector3.Distance(gameObject.transform.root.position, startLoc) <= 0.1f)
-            {
-                timeRemaining = searchTime;
-            }*/
-
-
-            //checkIfCanSeePlayer();
-            //chechIfPlayerIsInAttackRange();
+            } */    
          }     
-
     }
-
-
+    //NAVMESHAGENT HEDEF NOKTASI BELIRLE
     private void Move(Vector3 point)
     {
         gameObject.transform.root.GetComponent<NavMeshAgent>().SetDestination(point);
     }
+    //OYUNCUYU TAKIP EDERKEN GEREKLI OLAN BIR SONRAKI NOKTAYI BELIRLE
     private Vector3 GetNextPoint()
     {
 
@@ -143,25 +128,7 @@ public class EnemyChaseState : State
         Vector3 point = forward + x * distance + gameObject.transform.root.transform.position; 
         return point;
     }
-    /*private void StartTimer()
-    {
-
-        if (timerIsRunning)
-        {
-            if (timeRemaining > 0)
-            {
-                timeRemaining -= Time.deltaTime;
-            }
-            else
-            {
-                Debug.Log("Time has run out!");
-                timeRemaining = 0;
-                timerIsRunning = false;
-            }
-        }
-
-
-    }*/
+    //BOS DURUMA DONMESI ICIN GEREKEN MANTIK
     private bool ReturnToIdle()
     {
         if (Vector3.Distance(gameObject.transform.root.position, startLoc) <= 1f && searchTimeRemaining <= 0f)

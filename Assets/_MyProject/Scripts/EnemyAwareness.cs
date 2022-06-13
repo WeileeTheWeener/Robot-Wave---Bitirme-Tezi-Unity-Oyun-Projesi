@@ -8,10 +8,12 @@ public class EnemyAwareness : MonoBehaviour
     public EnemyStateManager stateManager;
     public float alertRadius;
 
+    
     private void OnDrawGizmos()
     {
         Gizmos.DrawWireSphere(transform.position, alertRadius);
     }
+    //DUSMANI LISTEYE EKLE
     public void Awake()
     {
         if(enemyList == null)
@@ -22,6 +24,7 @@ public class EnemyAwareness : MonoBehaviour
 
         enemyList.Add(gameObject);
     }
+    //SUANKI DURUMU ATTACKSTATE YAP
     public void AlertEnemies()
     {
         gameObject.transform.root.GetComponentInChildren<EnemyStateManager>().currentState = gameObject.transform.root.GetComponentInChildren<EnemyAttackState>();
@@ -33,6 +36,7 @@ public class EnemyAwareness : MonoBehaviour
                 continue;
             }
 
+            //EGER ARADAKI MESAFE KUCUK ISE LISTEDEKI DUSMANLARI SALDIRI DURUMUNA GECIR
             if(Vector3.Distance(enemy.transform.position,transform.position) < alertRadius)
             {
                 enemy.transform.root.GetComponentInChildren<EnemyStateManager>().currentState = enemy.transform.root.GetComponentInChildren<EnemyAttackState>();

@@ -22,10 +22,11 @@ public class EnemyIdleState : State
     public bool canSeePlayer;
     public bool hasDistinctPath;
     public float cachedHealth;
+
     public override State RunCurrentState()
     {
         
-
+        //EGER OYUNCUYU GORUYOSA VEYA HASAR ALGILANDIYSA ATTACK STATE E GEC
         if (canSeePlayer || damageDetected())
         {          
             return attackState;
@@ -38,14 +39,12 @@ public class EnemyIdleState : State
         }
     }
 
-    // Start is called before the first frame update
+   
     void Start()
     {
     
         canSeePlayer = gameObject.transform.root.GetComponent<FieldOfView>().canSeePlayer;
         player = GameObject.FindWithTag("Player");    
-        //rootNavMeshAgent = gameObject.transform.parent.root.GetComponent<NavMeshAgent>();
-        //animator = gameObject.transform.root.GetComponent<Animator>();
         nextTimeToRoam = 0f;       
         startPosition = new Vector3(gameObject.transform.root.position.x, 0, gameObject.transform.root.position.z);
         roamPosition = startPosition;
@@ -58,7 +57,7 @@ public class EnemyIdleState : State
         cachedHealth = gameObject.transform.root.GetComponent<Stats>().currentHealth;
     }
 
-    // Update is called once per frame
+    
     public override void _Update()
     {
         gameObject.transform.root.GetComponent<FieldOfView>().radius = radius;
@@ -67,54 +66,49 @@ public class EnemyIdleState : State
         animator.SetBool("isInAttackState", false);
         currentPosition = new Vector3(gameObject.transform.root.position.x, 0, gameObject.transform.root.position.z);
         canSeePlayer = gameObject.transform.root.GetComponent<FieldOfView>().canSeePlayer;
-        //gameObject.transform.root.LookAt(new Vector3(roamPosition.x, gameObject.transform.root.position.y, roamPosition.z), Vector3.up);
 
+
+        //EGER ONCEDEN BELIRLI BIR ROTASI YOK ISE
         if(!hasDistinctPath)
         {
-            if(damageDetected())
-            {
-                Debug.Log("damage detected");
-
-            }
+          
+            //EGER KENDI POZISYONU VE HEDEF POZISYONU ARASINDAKI MESAFE AZ ISE VE DOLASMA ZAMANI GELMIS ISE HAREKET ET
             if (Vector3.Distance(currentPosition, roamPosition) <= 0.1f && Time.time >= nextTimeToRoam)
             {
-                nextTimeToRoam = Time.time + idleTime;
-                
-                //MoveToRoamPoint();
-
+                nextTimeToRoam = Time.time + idleTime; //BIDAHAKI DOLASMA ZAMANI SUANKI SURE + BEKLEME SURESI
 
                 roamPosition = GetValidPosition(currentPosition, roamingDistance);
 
                 SetRoamPoint(roamPosition);
                 MoveToRoamPoint(roamPosition);
 
-                /*Debug.Log(Vector3.Distance(hit.position, roamPosition));
-                Debug.DrawLine(hit.position, hit.position + Vector3.down, Color.yellow, 10f);
-                Debug.DrawLine(roamPosition, roamPosition + Vector3.up, Color.blue, 10f);*/
+             
             }
 
         }
+        //EGER ONCEDEN BELIRLI BIR ROTASI VAR ISE
         if(hasDistinctPath)
         {
 
-
+            //EGER SUANKI POZISYON ILE BASLANGIC POZISYONU YAKIN ISE VE
+            //BEKLEME ZAMANI DOLMUS ISE HEDEFE GIT
             if (Vector3.Distance(currentPosition, startPosition) <= 0.1f && Time.time >= nextTimeToRoam)
             {
-                nextTimeToRoam = Time.time + idleTime;
+                nextTimeToRoam = Time.time + idleTime; //BIDAHAKI DOLASMA ZAMANI SUANKI SURE + BEKLEME SURESI
                 SetRoamPoint(destinationPoint.transform.position);
-                //MoveToRoamPoint();
-
+         
             }
             else
             {
                 MoveToRoamPoint(roamPosition);
             }
+            //EGER SUANKI POZISYON ILE HEDEF POZISYON YAKIN ISE VE
+            //BEKLEME ZAMANI DOLMUS ISE BASLANGIC POZISYONUNA DON
             if (Vector3.Distance(currentPosition, destinationPoint.transform.position) <= 0.1f && Time.time >= nextTimeToRoam) 
             {
                 nextTimeToRoam = Time.time + idleTime;
                 SetRoamPoint(startPosition);
-                //MoveToRoamPoint();
-
+             
             }
             else
             {
@@ -122,7 +116,8 @@ public class EnemyIdleState : State
             }
 
         }
-
+        //EGER NAVMESHAGENTIN HEDEF NOKTASINA MESAFESI VARSA
+        //HAREKET EDIYORDUR YOKSA ETMIYORDUR
         if(rootNavMeshAgent.remainingDistance>0)
         {
             animator.SetBool("isMoving", true);
@@ -134,31 +129,38 @@ public class EnemyIdleState : State
             
            
         }
+        //ANLIK CANI KAYDET
         cachedHealth = gameObject.transform.root.GetComponent<Stats>().currentHealth;
 
     }
+    //ANLIK POZISYON VE HEDEF ARASI CIZGI CIZ
     private void OnDrawGizmos()
     {
         Gizmos.DrawLine(transform.root.position, roamPosition);
     }
+    //NAVMESHAGENTIN GIDICEGI YERI AYARLAR VE GITMESINI SAGLAR
     private void MoveToRoamPoint(Vector3 position)
     {
-        //rootNavMeshAgent.SetDestination(roamPosition);
         rootNavMeshAgent.SetDestination(position);
     }
+    //GIDIS YERI BELIRLE
     private void SetRoamPoint(Vector3 position)
     { 
         roamPosition = position;
        
     }
+    //RASTGELE YÖN DÖNDÜR
     public static Vector3 GetRandomDir()
     {
         return new Vector3(Random.Range(-1f, 1f),0,Random.Range(-1f, 1f)).normalized;
     }
+    // RASTGELE POZISYON DONDUR
     public static Vector3 GetRandomPosition(Vector3 currentPos,float roamingDistance)
     {     
-        return currentPos + GetRandomDir() * roamingDistance;
+        //RASTGELE YÖN VEKTORU ILE MESAFEYI CARPARAK POZISYON ELDE ET
+        return currentPos + GetRandomDir() * roamingDistance; 
     }
+    //POZISYON NAVMESHIN YANE YURUNEBILIR ALANIN USTUNDEMI KONTROL ET
     public static Vector3 GetValidPosition(Vector3 currentPos, float roamingDistance)
     {
         NavMeshHit hit;
@@ -172,11 +174,10 @@ public class EnemyIdleState : State
         while (Vector3.Distance(hit.position, randomPos) > 0.1f);
         return randomPos;
     }
+    //EGER SUANKI CAN BIR ONCEKI CANA ESIT DEGILSE HASAR TESPIT EDILMISTIR
     public bool damageDetected()
     {
         return cachedHealth != gameObject.transform.root.GetComponent<Stats>().currentHealth;
-
-        
 
 
     }

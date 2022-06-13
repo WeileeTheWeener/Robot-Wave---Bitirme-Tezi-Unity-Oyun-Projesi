@@ -5,29 +5,22 @@ using UnityEngine;
 public class EnemyStateManager : MonoBehaviour
 {
     public State currentState;
-    
-
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
-
-    // Update is called once per frame
+     
     void Update()
     {
-        RunStateMachine();
-    }
+        RunStateMachine(); //STATE MAKINESINI YURUT
+    } 
     private void RunStateMachine()
     {
+        //EGER CURRENT STATE NULL ISE NEXT STATE NULL OLUR DEGIL ISE RUNCURRENTSTATE CAGIRILIR
         State nextState = currentState?.RunCurrentState();
 
         if (nextState != null)
         {
-            SwitchToTheNextState(nextState);
+            SwitchToTheNextState(nextState); // BIR SONRAKI DURUMA GEC 
             
         }
-        currentState._Update();
+        currentState._Update(); //CURRENT STATEIN UPDATE FONKSIYONUNU CAGIR
     }
     private void SwitchToTheNextState(State nextState)
     {

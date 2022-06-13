@@ -21,7 +21,7 @@ public class Stats : MonoBehaviour
         myHealthBar.setMaxSliderValue(maxHealth);
         myHealthBar.setSliderValue(currentHealth);
 
-
+        //OLUSTUGU ANDA TAGI ENEMY ISE KALAN DUSMAN SAYISINI ARTTIR
         if (CompareTag("Enemy"))
         {
             ObjectSpawner.remainingEnemies++;
@@ -33,6 +33,7 @@ public class Stats : MonoBehaviour
     {
         ClampHealth();
     }
+    //CAN DEGERININ LIMITLERINI AYARLAR
     void ClampHealth()
     {
         if (currentHealth <= minHealth)
@@ -40,11 +41,13 @@ public class Stats : MonoBehaviour
             currentHealth = minHealth;
             gameObject.SetActive(false);
 
+            //EGER CAN BITMIS ISE VE TAGI ENEMY ISE DUSMAN SAYISINI AZALT
             if(CompareTag("Enemy"))
             {
                 ObjectSpawner.remainingEnemies--;
 
-                if(Random.RandomRange(0,5) == 0)
+                //BELIRLI BIR SANS ILE ITEM DUSUR
+                if(Random.Range(0,4) == 0)
                 {
                     GameObject ammoObject = GameObject.Instantiate(ammoObjectPrefab);
                     ammoObject.transform.position = transform.position;
@@ -60,6 +63,7 @@ public class Stats : MonoBehaviour
         }
 
     }
+    //HASAR ALMAYI SAGLAR
     public void TakeDamage(float damage)
     {
         currentHealth -= damage;

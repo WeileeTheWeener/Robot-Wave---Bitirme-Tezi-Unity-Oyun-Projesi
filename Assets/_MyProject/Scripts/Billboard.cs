@@ -5,15 +5,18 @@ using UnityEngine;
 public class Billboard : MonoBehaviour
 {
     public Transform Cam;
-    // Start is called before the first frame update
+    
     void Start()
     {
+        //SAHNEDEKI ANA KAMERAYI AL
         Cam = Camera.main.transform;
+        
     }
 
-    // Update is called once per frame
+   
     void LateUpdate()
     {
+        //TAKILI OBJENIN ÝLERÝ EKSENÝNÝ KAMERAYA BAKICAK SEKILDE AYARLA
         transform.LookAt(transform.position + Cam.transform.forward);
     }
 }

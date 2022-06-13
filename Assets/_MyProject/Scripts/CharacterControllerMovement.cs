@@ -22,6 +22,7 @@ public class CharacterControllerMovement : MonoBehaviour
 
     void Start()
     {
+        //KARAKTER KONTROLCU COMPONENTINI VE KAMERAYI AL
         characterController = GetComponent<CharacterController>();
         cam = Camera.main;
      
@@ -30,6 +31,7 @@ public class CharacterControllerMovement : MonoBehaviour
 
     void Update()
     {
+        //FONKSIYONLARI CALISTIR
         LookAtMouseDirection();
         HandleMovement();
         HandleGravity();     
@@ -37,6 +39,7 @@ public class CharacterControllerMovement : MonoBehaviour
 
     void HandleGravity()
     {
+        //RIGIDBODY KULLANMADIGIMIZ ICIN YERCEKIMINI BASIT BIR SEKILDE SIMULE ET
         if (characterController.isGrounded)
         {
             characterController.Move(new Vector3(0, -0.1f, 0));
@@ -49,21 +52,25 @@ public class CharacterControllerMovement : MonoBehaviour
 
     void HandleMovement()
     {
+        
         bool leftShiftPressed = Input.GetKey(KeyCode.LeftShift);
 
+        //GIRDI EKSENLERINI X VE Z YI AL BASILI OLDUGU AN 1 OLUR
         inputVector = new Vector3(Input.GetAxisRaw("Horizontal"), 0, Input.GetAxisRaw("Vertical"));
        
-
+        //EGER SHIFTE BASILI ÝSE VELOCITY DEGISKENINI SUANKI HALINDEN RUNVELOCITYE DOGRU CEK 
         if (leftShiftPressed)
         {
             Velocity = Mathf.MoveTowards(Velocity, runVelocity, runAcceleration * Time.deltaTime);
             speedMult = runSpeedMultiplyer;
         }
-        if(!leftShiftPressed)
+        //EGER SHIFTE BASILI DEGILSE VELOCITY DEGISKENINI SUANKI HALINDEN WALKVELOCITYE DOGRU CEK 
+        if (!leftShiftPressed)
         {
             Velocity = Mathf.MoveTowards(Velocity, walkVelocity, runDeceleration * Time.deltaTime);
             speedMult = walkSpeedMultiplyer;
         }
+        //EGER GIRDI YOKSA HIZI SIFIRLA VEYA DUSUR
         if(inputVector.x == 0f && inputVector.z ==0f)
         {
             Velocity = 0f;
@@ -72,20 +79,27 @@ public class CharacterControllerMovement : MonoBehaviour
         {
             Velocity = Mathf.MoveTowards(Velocity, 0f, runDeceleration * Time.deltaTime);
         }
-        
-        characterController.Move(inputVector * Velocity * Time.deltaTime * speedMult); //move in global axis
+
+        //HAREKET YONUYLE USTTEKI HIZ(Velocity) ILE VE HIZ KATSAYISI VE TIME.DELTA TIME ILE CARPARAK HAREKET ET
+        //NOT: TIME.DELTATIME OYUNUN KARE SAYISINA BAGIMSIZ IS YAPMAYI SAGLAR, 1/ KARE SAYISIDIR.
+        characterController.Move(inputVector * Velocity * Time.deltaTime * speedMult);
        
        
 
     }
     private void LookAtMouseDirection()
     {
+        //ISIN VE ISIN CARPISMA BILGISINI TUTAN DEGISKENLERINI OLUSTUR
         Ray ray = cam.ScreenPointToRay(Input.mousePosition);
         RaycastHit hit;
+
+        //ISINI EKRANA CIZ
         Debug.DrawRay(ray.origin, ray.direction, Color.red);
 
+        //RAY ISIMLI ISINI FIRLAT,CARPISMA VERISINI HIT DEGISKENINE ATA,CARPISMADA MASKE UYUSUYOR ISE DEVAM ET
         if (Physics.Raycast(ray, out hit,layerMask))
         {
+            //KARAKTERI FARE POZISYONUNA DOGRU CEVIR
             mouseWorldPosition = new Vector3(hit.point.x,transform.position.y,hit.point.z);
             gameObject.transform.forward = (mouseWorldPosition - gameObject.transform.position);
         }

@@ -1,89 +1,92 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.AI;
 
 public class EnemyAnimationBlendTreeController : MonoBehaviour
 {
     Animator anim;
-    UnityEngine.AI.NavMeshAgent agent;
-    Vector2 smoothDeltaPosition = Vector2.zero;
+    NavMeshAgent agent;
     Vector2 velocity = Vector2.zero;
-    bool shouldShoot;
     bool canSeePlayer;
-    public float shootingWeight;
-    public float shootingWeightAcceleration;
-    public float shootingWeightDeceleration;
+    public float ýdleShootingWeight;
+    public float walkShootingWeight;
+    public float ýdleShootingWeightAcceleration;
+    public float walkShootingWeightAcceleration;
+    public float ýdleShootingWeightDeceleration;
+    public float walkShootingWeightDeceleration;
+
 
     void Start()
     {
+        //ANIMATOR VE NAVMESHAGENT COMPONENTLERINI AL
         anim = GetComponent<Animator>();
-        agent = GetComponent<UnityEngine.AI.NavMeshAgent>();
-        // Dont update position automatically
-        agent.updatePosition = false;
+        agent = GetComponent<NavMeshAgent>();
+
      
     }
 
     void Update()
     {
+
+        //OYUNCUYU GORUYORMU BILGISINI AL
         canSeePlayer = gameObject.transform.root.GetComponent<FieldOfView>().canSeePlayer;
 
-        Vector3 worldDeltaPosition = agent.nextPosition - transform.position;
+        //NAVMESHAGENT HIZ BILGISINI AL
+        velocity = new Vector2(agent.velocity.x, agent.velocity.z);
 
-        // Map 'worldDeltaPosition' to local space
-        float dx = Vector3.Dot(transform.right, worldDeltaPosition);
-        float dy = Vector3.Dot(transform.forward, worldDeltaPosition);
-        Vector2 deltaPosition = new Vector2(dx, dy);
+        bool shouldMove;
 
-        // Low-pass filter the deltaMove
-        float smooth = Mathf.Min(1.0f, Time.deltaTime / 0.15f);
-        smoothDeltaPosition = Vector2.Lerp(smoothDeltaPosition, deltaPosition, smooth);
-
-        // Update velocity if time advances
-        if (Time.deltaTime > 1e-5f)
-            velocity = smoothDeltaPosition / Time.deltaTime;
-
-        bool shouldMove = velocity.magnitude > 0.5f && agent.remainingDistance > agent.radius;
-
-        if(canSeePlayer)
+        //BOOL DEGISKENINI HIZA GORE DEGISTIR
+        if (agent.velocity.magnitude > 0.1f)
         {
-            shouldShoot = true;
+            shouldMove = true;
         }
-        if(!canSeePlayer)
+        else shouldMove = false;
+
+
+        //OYUNCUYU GORUYORSA VE DURUYORSA
+        //ANIMATORDEKI IDLESHOOTINGI ARTTIR VE WALKSHOOTINGI DUSUR
+        if (canSeePlayer && !shouldMove)
         {
-            shouldShoot = false;
-        }
+            
+           ýdleShootingWeight = Mathf.MoveTowards(ýdleShootingWeight, 1f, ýdleShootingWeightAcceleration * Time.deltaTime);
+           anim.SetLayerWeight(1, ýdleShootingWeight);
 
-        if (shouldShoot)
+
+           walkShootingWeight = Mathf.MoveTowards(walkShootingWeight, 0f, walkShootingWeightDeceleration * Time.deltaTime);
+           anim.SetLayerWeight(2, walkShootingWeight);   
+            
+        }
+        //OYUNCUYU GORUYORSA VE HAREKET EDIYORSA
+        //ANIMATORDEKI WALKSHOOTINGI ARTTIR VE IDLESHOOTINGI DUSUR
+        if (canSeePlayer && shouldMove)
         {
-            shootingWeight = Mathf.MoveTowards(shootingWeight, 1f, shootingWeightAcceleration * Time.deltaTime);
-            anim.SetLayerWeight(1, shootingWeight);
-            //animator.SetLayerWeight(1, 1f);
+            walkShootingWeight = Mathf.MoveTowards(walkShootingWeight, 1f, walkShootingWeightAcceleration * Time.deltaTime);
+            anim.SetLayerWeight(2, walkShootingWeight);
 
+
+            ýdleShootingWeight = Mathf.MoveTowards(ýdleShootingWeight, 0f, ýdleShootingWeightDeceleration * Time.deltaTime);
+            anim.SetLayerWeight(1, ýdleShootingWeight);
         }
-        else if (!shouldShoot)
+        //OYUNCUYU GORMUYORSA SHOOTING WEIGHTLERI DUSUR
+        if (!canSeePlayer)
         {
-            shootingWeight = Mathf.MoveTowards(shootingWeight, 0f, shootingWeightDeceleration * Time.deltaTime);
-            anim.SetLayerWeight(1, shootingWeight);
-            //animator.SetLayerWeight(1, 0f);
+            walkShootingWeight = Mathf.MoveTowards(walkShootingWeight, 0f, walkShootingWeightDeceleration * Time.deltaTime);
+            anim.SetLayerWeight(2, walkShootingWeight);
 
+            ýdleShootingWeight = Mathf.MoveTowards(ýdleShootingWeight, 0f, ýdleShootingWeightDeceleration * Time.deltaTime);
+            anim.SetLayerWeight(1, ýdleShootingWeight);
         }
 
-        // Update animation parameters
+ 
+        //DEGISKENLERI ANIMATOR DEGISKENLERINE ATA
         anim.SetBool("move", shouldMove);
         anim.SetFloat("VelocityX", velocity.x);
         anim.SetFloat("VelocityZ", velocity.y);
-
-        // GetComponent<LookAt>().lookAtTargetPosition = agent.steeringTarget + transform.forward;
-
-        //look at
-        /*LookAt lookAt = GetComponent<LookAt>();
-        if (lookAt)
-            lookAt.lookAtTargetPosition = agent.steeringTarget + transform.forward; */
+        
+       
     }
 
-    void OnAnimatorMove()
-    {
-        // Update position to agent position
-        transform.position = agent.nextPosition;
-    }
+
 }

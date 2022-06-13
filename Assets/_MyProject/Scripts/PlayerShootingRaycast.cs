@@ -18,12 +18,7 @@ public class PlayerShootingRaycast : MonoBehaviour
     public float nextTimeToFire = 0f;
     public float range;
     public float damage;
-    //public int currentAmmo;
-    //public int maxMagazines;
-    //public int currentMagazines;
-    //public int maxAmmo;
     public bool shootingPreviousFrame;
-    //public Text ammoText;
     private Animator animator;
     private Vector3 hitPointOfBarrel;
     private Canvas crosshairCanvas;
@@ -32,26 +27,25 @@ public class PlayerShootingRaycast : MonoBehaviour
     public GameObject muzzleFlashLightObject;
     public Color startColor;
     public Color endColor;
+    private AnimationBlendTreeController treeController;
+    bool reloadPressed;
 
-    // Start is called before the first frame update
     void Start()
     {
 
         shootingPreviousFrame = false;
-        //currentAmmo = maxAmmo;
-        //currentMagazines = maxMagazines; currentAmmo > 0 
         animator = gameObject.transform.root.GetComponent<Animator>();
         soundManager = gameObject.transform.root.GetComponent<SoundManager>();
         playerAmmo = gameObject.transform.root.GetComponent<PlayerAmmo>();
+        treeController = gameObject.transform.root.GetComponent<AnimationBlendTreeController>();
     }
-
-    // Update is called once per frame
     void Update()
     {
+
         GetMousePos();
         bool shootingThisFrame = false;
 
- 
+        //ATES ET
         if (Input.GetButton("Fire1") && Time.time >= nextTimeToFire && playerAmmo.currentAmmo > 0 && (animator.GetLayerWeight(1) == 1 || animator.GetLayerWeight(2) == 1 || animator.GetLayerWeight(3) == 1) && animator.GetLayerWeight(4) ==0)
         {
             nextTimeToFire = Time.time + 1f / fireRate;
@@ -77,19 +71,28 @@ public class PlayerShootingRaycast : MonoBehaviour
         }
         if (Input.GetKeyDown(KeyCode.R))
         {
-            //ReloadMagazine();
+            StartCoroutine(waitForReload());
+        }
+        //MERMÝYÝ ANÝMASYONUN SONUNDA OYNATIOMUS GIBI OLMASI ICIN 1 SN BEKLE
+        IEnumerator waitForReload() 
+        {
+            yield return new WaitForSeconds(1f);
             playerAmmo.ReloadMagazine();
         }
-        //ammoText.text = currentMagazines + "/" + currentAmmo;
-        //playerAmmo.ammoText.text = playercurrentMagazines + "/" + currentAmmo;
+     
 
         shootingPreviousFrame = shootingThisFrame;
     }
+    //RAYCAST ILE ATIS YAP
     void Shoot()
     {
+        //TAKILI OLAN OBJEDEN ILERI DUZ BIR CIZGI YARAT
         ray = new Ray(gameObject.transform.position, gameObject.transform.forward);
 
+        //GERCEK MERMI YONU ILE NAMLU ARASINDAKI YONU AL
         Vector3 dirr = (ray.GetPoint(range) - barrel.transform.position).normalized;
+
+        //NAMLUDAN CIKAN MERMI IZININ GIDECEGI SON POZISYON
         hitPointOfBarrel = barrel.transform.position + dirr * range;
 
 
@@ -98,12 +101,13 @@ public class PlayerShootingRaycast : MonoBehaviour
         
         if (Physics.Raycast(ray, out hit,range,shootableMask))
         {
-                    
+            //EGER DUSMANA CARPTIYSA HASAR VER       
             if (hit.collider.gameObject.CompareTag("Enemy"))
             {                
                 Debug.Log("we hit an enemy");
                 hit.transform.GetComponent<Stats>().TakeDamage(damage);               
             }
+            //EGER ENGELE CARPTIYSA ENGELDE IZI KES
             if (hit.collider.gameObject.layer == LayerMask.NameToLayer("Obstacles") && hit.collider != null)
             {
                 hitPointOfBarrel = barrel.transform.position + dirr * hit.distance;
@@ -111,9 +115,8 @@ public class PlayerShootingRaycast : MonoBehaviour
          
         }
 
+        //EGER DUSMANIN YAKININA ATES ETMIS ISEK DUSMANLARI ALARM DURUMUNA GECIR
         RaycastHit alertHit;
-
-        
         if (Physics.Raycast(ray, out alertHit, range,alertMask))
         {
             alertHit.transform.GetComponent<EnemyAwareness>().AlertEnemies();
@@ -121,28 +124,19 @@ public class PlayerShootingRaycast : MonoBehaviour
         
         }
 
-
+        //MERMI IZI OLUSTUR
         BulletTrailUtil.PlayTrailAnimation(
         barrel.transform.position, 
         hitPointOfBarrel,
         startColor,
         endColor);
 
-        //currentAmmo -= 1;
+        //ANLIK MERMIYI AYARLA
         playerAmmo.setCurrentAmmo(playerAmmo.currentAmmo - 1);
 
     }
-    /*void ReloadMagazine()
-    {
-        if (currentMagazines > 0)
-        {
-            currentAmmo = maxAmmo;
-            currentMagazines -= 1;
-            soundManager.PlayReload();
-            
-        }
     
-    }*/
+    //FARE POZISYONU AL
     void GetMousePos()
     {
         Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
@@ -152,6 +146,7 @@ public class PlayerShootingRaycast : MonoBehaviour
             mousePos = new Vector3(hit.point.x,gameObject.transform.position.y,hit.point.z);
         }
     }
+    //NAMLU ISIGI OYNAT
     IEnumerator PlayMuzzleParticle()
     {
         muzzleFlashLightObject.SetActive(true);

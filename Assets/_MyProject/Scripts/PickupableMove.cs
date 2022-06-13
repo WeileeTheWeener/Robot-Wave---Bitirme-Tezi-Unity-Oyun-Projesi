@@ -7,7 +7,7 @@ public class PickupableMove : MonoBehaviour
     Vector3 originalPosition;
  
   
-    // Update is called once per frame
+    //OYUNCU TARAFINDAN ALINABILIR OBJEYI YUKARI ASAGIYA HAREKET ETTIR
     void Update()
     {
         transform.position = new Vector3 (transform.position.x,Mathf.Sin(Time.time)+originalPosition.y+1f, transform.position.z);

@@ -5,6 +5,7 @@ using UnityEngine;
 public class AnimationBlendTreeController : MonoBehaviour
 {
     Animator animator;
+    PlayerAmmo playerAmmo;
     float VelocityX;
     float VelocityZ;
     public float movementAcceleration = 2f;
@@ -17,7 +18,7 @@ public class AnimationBlendTreeController : MonoBehaviour
     public float reloadWeightDeceleration;
     public float shootingWeight;
     public float reloadWeight;
-    public float currentMagazineCount;
+    public int currentMagazineCount;
     public bool keyUpToggle;
     public bool leftShiftPressedToggle;
     public bool hasAmmo;  
@@ -29,8 +30,9 @@ public class AnimationBlendTreeController : MonoBehaviour
   
     void Start()
     {
-        //ANIMATOR DEGISKENINI AL
-        animator = gameObject.GetComponent<Animator>();
+        
+        animator = gameObject.GetComponent<Animator>(); //ANIMATOR COMPONENTÝNÝ AL
+        playerAmmo = gameObject.GetComponent<PlayerAmmo>();
 
         shootingWeight = 0f;
         hasAmmo = false;
@@ -42,36 +44,44 @@ public class AnimationBlendTreeController : MonoBehaviour
     }
     void Update()
     {   
-
-       bool leftShiftPressed = Input.GetKey(KeyCode.LeftShift);
+        //SHIFT BASILIMI KONTROL ET
+        bool leftShiftPressed = Input.GetKey(KeyCode.LeftShift);
 
         if (Input.GetKeyUp(KeyCode.LeftShift))
         {
             leftShiftPressedToggle = !leftShiftPressedToggle;
         }
 
-      
-        currentMagazineCount = GetComponent<PlayerAmmo>().currentMagazines;
+        //MERMÝYÝ KONTROL ET
+        currentMagazineCount = GetComponent<PlayerAmmo>().currentMagazines;   
+        
+        /*int currentAmmo = GetComponent<PlayerAmmo>().currentAmmo;
 
-        if (currentMagazineCount > 0)
+        if (currentAmmo > 0)
         {
             hasAmmo = true;
         }
-        else hasAmmo = false;
+        else hasAmmo = false;*/
+
         
-       
-      
+
+
+        //EGER SOL SHIFT BASILI ISE ANLIK MAKSIMUM HIZI DEGISTIR
         float currentMaxVelocity = leftShiftPressed ? maximumRunVelocity : maximumWalkVelocity;
 
+        //DUNYAYA GORE EKSENLERI AL VE LOKALE CEVIR
         Vector2 worldInput = new Vector2(Input.GetAxis("Horizontal"),Input.GetAxis("Vertical"));
         Vector2 forward = new Vector2(transform.forward.x, transform.forward.z).normalized;
         Vector2 right = new Vector2(transform.right.x, transform.right.z).normalized;
 
         Vector2 input = new Vector2(Vector2.Dot(worldInput, right), Vector2.Dot(worldInput, forward)).normalized;
 
+        //X VE Z EKSENINDEKI HAREKETI TANIMLA
         VelocityX = Mathf.MoveTowards(VelocityX, input.x * currentMaxVelocity, Time.deltaTime * movementAcceleration);
         VelocityZ = Mathf.MoveTowards(VelocityZ, input.y * currentMaxVelocity, Time.deltaTime * movementAcceleration);
 
+
+        //YÜRÜMEYÝ KONTROL ET
         if(input.x == 0 && input.y == 0)
         {
             animator.SetBool("isMoving", false);
@@ -189,7 +199,7 @@ public class AnimationBlendTreeController : MonoBehaviour
         {
             reloadTimeRemaining = reloadTimeStart;
         }
-        if (reloadPressed && hasAmmo)
+        if (reloadPressed && currentMagazineCount > 0)
         {
             reloadWeight = Mathf.MoveTowards(reloadWeight, 1f, reloadWeightAcceleration * Time.deltaTime);
             animator.SetLayerWeight(4, reloadWeight);
@@ -205,7 +215,7 @@ public class AnimationBlendTreeController : MonoBehaviour
             }
          
         }
-        //IF SHOOTING DECREASE IT WHILE RELOADING
+        //SARJOS DEGISTIRIRKEN VURMA AGIRLIKLARINI AZALT
         if (animator.GetLayerWeight(4) != 0)
         {
             isReloading = true;

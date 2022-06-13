@@ -2868,9 +2868,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a592bdfe66d189d499294d8d90b827ef, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  shootingWeight: 0
-  shootingWeightAcceleration: 2
-  shootingWeightDeceleration: 2
+  "\u0131dleShootingWeight": 0
+  walkShootingWeight: 0
+  "\u0131dleShootingWeightAcceleration": 4
+  walkShootingWeightAcceleration: 4
+  "\u0131dleShootingWeightDeceleration": 4
+  walkShootingWeightDeceleration: 4
 --- !u!82 &968679437707551485
 AudioSource:
   m_ObjectHideFlags: 0

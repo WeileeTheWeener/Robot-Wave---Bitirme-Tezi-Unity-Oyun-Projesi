@@ -34,15 +34,16 @@ public class ObjectSpawner : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-
-
+        //EGER SUANKI DALGANIN BUTUN DUSMANLARI OLUSTURULMUS ISE 
         if (currentWavesCurrentSpawnNumber >= currentWavesMaxSpawnNumber)
         {
            
             allWaveEnemiesSpawned = true;
 
+            //EGER BUTUN DUSMANLAR OLMUS ISE
             if (AllEnemiesDead())
             {
+
                 if(musicFade != null)
                 {
                     StopCoroutine(musicFade);
@@ -50,13 +51,15 @@ public class ObjectSpawner : MonoBehaviour
                 musicFade = FadeOut();
                 StartCoroutine(musicFade);
 
-                currentWaveNumber++;
-                DeleteWavesEnemies();
-                currentWavesCurrentSpawnNumber = 0;
-                currentWavesMaxSpawnNumber += 3;
-                allWaveEnemiesSpawned = false;
-                nextTimeToStartNewWave = Time.time + waitForWaveSeconds;
+               
+                currentWaveNumber++;  //DALGA NUMARASINI ARTTIR
+                DeleteWavesEnemies(); //DALGA DUSMANLARINI SÝL
+                currentWavesCurrentSpawnNumber = 0; //DUSMAN SAYISINI 0A CEK
+                currentWavesMaxSpawnNumber += 3; //MAKSIMUM DUSMAN SAYISINI 3 ER 3 ER ARTTIR
+                allWaveEnemiesSpawned = false; 
+                nextTimeToStartNewWave = Time.time + waitForWaveSeconds; //BELIRLI BIR SURE BEKLE
 
+                //OYUNDAKI DUVARLARIN YERINI DEGISTIR
                foreach(GameObject gameObject in GameObjectsToRandomize)
                {
                     gameObject.GetComponent<RandomizePosition>().RandomizeGameObjectPosition();
@@ -64,7 +67,8 @@ public class ObjectSpawner : MonoBehaviour
 
             }
 
-        }      
+        }
+        //EGER BUTUN DUSMANLAR OLUSTURULMAMIS ISE OBJE YARAT
         if (Time.time >= nextTimeToSpawn && !allWaveEnemiesSpawned)
         {
             if(Time.time < nextTimeToStartNewWave)
@@ -74,6 +78,7 @@ public class ObjectSpawner : MonoBehaviour
             nextTimeToSpawn = Time.time + spawnRate;
             SpawnObject();
 
+        
             if(currentWavesCurrentSpawnNumber == 0)
             {
                 if (musicFade != null)
@@ -89,10 +94,11 @@ public class ObjectSpawner : MonoBehaviour
         }
         waveSpawnBreak:;
 
-
+        //ARAYÜZÜ AYARLA
         uiScript.SetRemainingEnemy(remainingEnemies);
         uiScript.SetCurrentWave(currentWaveNumber);
 
+        //ARAYÜZDEKÝ DALGA BASLAMA SURESINI GOSTER VE KAPAT VEYA AC
         if(nextTimeToStartNewWave - Time.time > 0)
         {
             uiScript.nextWaveStartTime.gameObject.SetActive(true);
@@ -102,7 +108,7 @@ public class ObjectSpawner : MonoBehaviour
         uiScript.SetNextWaveStartTime(nextTimeToStartNewWave-Time.time);
 
     }
-
+    //SAHNEDE BELIRLI BIR ALAN ICINDE OBJE YARAT 
     void SpawnObject()
     {
         GameObject enemy = GameObject.Instantiate(prefab);       
@@ -112,10 +118,12 @@ public class ObjectSpawner : MonoBehaviour
         currentWaveEnemies.Add(enemy);
 
     }
+    //DUSMANLARI SÝL
     void DeleteWavesEnemies()
     {
         currentWaveEnemies.Clear();
     }
+    //OYUNCUYA YAKIN OLAN DUSMAN OLUSTURMA BOLGESINI DONDUR 
     Transform GetClosestSpawn()
     {
         float closestDistance;
@@ -134,6 +142,7 @@ public class ObjectSpawner : MonoBehaviour
         }
         return closestTransform;
     }
+    //MUZIK SESINI ARTTIR
     public IEnumerator FadeIn()
     {
         for(int i = 0; i < 100; i++)
@@ -143,6 +152,7 @@ public class ObjectSpawner : MonoBehaviour
             yield return new WaitForSeconds(0.025f);
         }
     }
+    //MUZIK SESINI AZALT
     public IEnumerator FadeOut()
     {
         for (int i = 100; i >= 0; i--)
@@ -152,12 +162,13 @@ public class ObjectSpawner : MonoBehaviour
             yield return new WaitForSeconds(0.025f);
         }
     }
+    //BUTUN DUSMANLARIN OLUP OLMEDIGINI KONTROL ET
     bool AllEnemiesDead()
     {
 
         foreach (GameObject enemy in currentWaveEnemies)
         {
-            if (enemy.active)
+            if (enemy.activeInHierarchy)
             {
                 return false;
             }

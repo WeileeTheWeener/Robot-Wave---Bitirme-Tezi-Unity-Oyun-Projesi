@@ -12,19 +12,18 @@ public class PlayerAmmo : MonoBehaviour
     public int maxMagazines;
     public SoundManager playerSoundManager;
 
-    // Start is called before the first frame update
     void Start()
     {
         currentAmmo = maxAmmo;
         currentMagazines = maxMagazines;
     }
 
-    // Update is called once per frame
     void Update()
     {
         ClampAmmo();
         SetText();
     }
+    //SARJOR DEGISTIR
     public void ReloadMagazine()
     {
         if (currentMagazines > 0)
@@ -36,11 +35,13 @@ public class PlayerAmmo : MonoBehaviour
         }
 
     }
+    //ANLIK MERMIYI AYARLA
     public void setCurrentAmmo(int ammo)
     {
         currentAmmo = ammo;
 
     }
+    //MERMI VE SARJOR SAYI LIMITLERINI BELIRLE
     public void ClampAmmo()
     {
         if(currentAmmo > maxAmmo)
@@ -54,6 +55,7 @@ public class PlayerAmmo : MonoBehaviour
             currentMagazines = maxMagazines;
         }
     }
+    //ARAYUZDEKI MERMI SAYISINI AYARLA
     public void SetText()
     {
         ammoText.text = currentMagazines + "/" + currentAmmo;

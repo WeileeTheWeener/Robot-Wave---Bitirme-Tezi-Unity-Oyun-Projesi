@@ -39,6 +39,7 @@ public class SoundManager : MonoBehaviour
 	}
     private void Update()
     {
+		//EGER SOL SHIFT TUSU BASILI DEGIL ISE YURUYUS HIZINI WALK SPEEDE ESITLE VE SESI OYNAT
 		if(!Input.GetKey(KeyCode.LeftShift))
         {
 			currentSpeed = walkSpeed;
@@ -50,8 +51,9 @@ public class SoundManager : MonoBehaviour
 			}
 
 		}
+		//EGER SOL SHIFT TUSU BASILI  ISE YURUYUS HIZINI RUN SPEEDE ESITLE VE SESI OYNAT
 		else
-        {
+		{
 			currentSpeed = runSpeed;
 
 			if ((Input.GetAxisRaw("Horizontal") != 0 || Input.GetAxisRaw("Vertical") != 0 ) && Time.time >= nextTimeToPlay)
@@ -62,46 +64,47 @@ public class SoundManager : MonoBehaviour
 		}
 
 	}
+	//SÝLAH DEÞARJ SESÝ OYNAT
 	public void PlayGunDecharge()
 	{
 
 		dechargeAudioSource.PlayOneShot(gunDeChargeClip);
-		//audio.volume = volume;
 		dechargeAudioSource.outputAudioMixerGroup = gunDeChargeMixer;
 	}
-
+	//AYAK SESÝ OYNAT
 	void PlayFootsteps()
 	{
+		//LÝSTEDEN SESLERI RASTGELE OYNAT
 		int footstepIndex = Random.Range(0, footstepList.Count);
 		footstepsAudioSource.PlayOneShot(footstepList[footstepIndex]);
-		//audio.volume = volume;
+		//SES CIKISINI MIXERE ATA
 		footstepsAudioSource.outputAudioMixerGroup = footstepMixer;
 	}
+	//SILAH ATES SESI OYNAT
 	public void PlayGunShot()
 	{
 		int gunShotIndex = Random.Range(0, gunshotList.Count);
 		audio.PlayOneShot(gunshotList[gunShotIndex]);
-		//audio.volume = volume;
 		audio.outputAudioMixerGroup = gunshotMixer;
 	}
+	//SARJOR DEGISTIRME SESI OYNAT
 	public void PlayReload()
 	{
 		audio.PlayOneShot(reloadClip);
-		//audio.volume = volume;
 		audio.outputAudioMixerGroup = reloadMixer;
 
 	}
+	//ITEM ALINCA CIKACAK SESI OYNAT
 	public void PlayPickup()
 	{
 		audio.PlayOneShot(pickupClip);
-		//audio.volume = volume;
 		audio.outputAudioMixerGroup = pickupMixer;
 
 	}
+	//ARAYUZ SESI OYNAT
 	public void PlayUISound(float volume)
 	{
 		audio.PlayOneShot(uiClip);
-		//audio.volume = volume;
 		audio.volume = volume;
 
 	}

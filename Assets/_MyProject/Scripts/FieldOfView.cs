@@ -31,7 +31,7 @@ public class FieldOfView : MonoBehaviour
             yield return wait;
             CheckFOV();
         }
-    }
+    }//GORUS ACISI KONTROL ET 
     private void CheckFOV()
     {
         Collider[] rangeChecks = Physics.OverlapSphere(transform.position, radius, targetMask);

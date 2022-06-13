@@ -20,11 +20,13 @@ public class EnemySoundManager : MonoBehaviour
     // Use this for initialization
     void Start()
     {
+        //NAVMESH AGENT VE SES OYNATMAK ICIN GEREKLI AUDIO SOURCE COMPONENTI AL
         navMeshAgent = gameObject.transform.root.gameObject.GetComponent<UnityEngine.AI.NavMeshAgent>();
         audio = this.GetComponent<AudioSource>();
     }
     private void Update()
     {
+        //EGER HEDEFE UZAKLIK VAR ISE VE BIR SONRAKI CALMA ZAMANI GELMIS ISE AYAK SESÝ OYNAT
         if (navMeshAgent.remainingDistance > 0.1f && Time.time >= nextTimeToPlay)
         {
             nextTimeToPlay = Time.time + FootstepSpeed;
@@ -32,18 +34,23 @@ public class EnemySoundManager : MonoBehaviour
         }        
     }
 
+    //AYAK SESÝ OYNAT
     void PlayFootsteps(float volume)
     {
+        //LÝSTEDEN SESLERI RASTGELE OYNAT
         int footstepIndex = Random.Range(0, footstepList.Count);
         audio.PlayOneShot(footstepList[footstepIndex]);
         audio.volume = volume;
     }
+    //SÝLAH SESÝ OYNAT
     public  void PlayGunShot(float volume)
     {
+        //LÝSTEDEN SESLERI RASTGELE OYNAT
         int gunShotIndex = Random.Range(0, gunshotList.Count);
         audio.PlayOneShot(gunshotList[gunShotIndex]);
         audio.volume = volume;
     }
+    //SARJOR DEGISTIRME SESI OYNAT
     public void PlayReload(float volume)
     {
         audio.PlayOneShot(reloadClip);
