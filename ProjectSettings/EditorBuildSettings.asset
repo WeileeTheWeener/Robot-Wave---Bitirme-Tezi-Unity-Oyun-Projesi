@@ -9,6 +9,6 @@ EditorBuildSettings:
     path: Assets/_MyProject/Scenes/MenuScene.unity
     guid: d4172615303bea348a5c8150c2d944b7
   - enabled: 1
-    path: Assets/_MyProject/Scenes/leveldeneme.unity
+    path: Assets/_MyProject/Scenes/MainScene.unity
     guid: 1edbbd3cb45f50d46ad2e8af86ec6e4a
   m_configObjects: {}
